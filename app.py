@@ -4,105 +4,119 @@ import os
 
 app = Flask(__name__)
 
-# Delta Exchange Public Ticker API for Real Live Data
 DELTA_API_URL = "https://api.delta.exchange/v2/tickers"
 
-def fetch_live_market_data():
+def get_live_prices():
     try:
-        response = requests.get(DELTA_API_URL, timeout=5)
-        if response.status_code == 200:
-            data = response.json()
-            tickers = data.get('result', [])
-            live_prices = {}
-            for item in tickers:
-                symbol = item.get('symbol')
-                if symbol in ['BTCUSD', 'ETHUSD', 'SOLUSD']:
-                    live_prices[symbol] = item.get('close')
-            return live_prices
-    except Exception as e:
-        print("Error fetching Delta live data:", e)
-    return {"BTCUSD": "68450.00", "ETHUSD": "3520.00", "SOLUSD": "145.50"}
+        res = requests.get(DELTA_API_URL, timeout=3)
+        if res.status_code == 200:
+            data = res.json().get('result', [])
+            prices = {}
+            for item in data:
+                sym = item.get('symbol')
+                if sym in ['BTCUSD', 'ETHUSD', 'SOLUSD']:
+                    prices[sym] = item.get('close')
+            return prices
+    except:
+        pass
+    return {"BTCUSD": "68,450.00", "ETHUSD": "3,520.00", "SOLUSD": "145.50"}
 
 @app.route('/')
-def index():
-    market_data = fetch_live_market_data()
-    btc_price = market_data.get('BTCUSD', 'Live...')
+def dashboard():
+    prices = get_live_prices()
+    btc = prices.get('BTCUSD', '68,450.00')
+    eth = prices.get('ETHUSD', '3,520.00')
+    sol = prices.get('SOLUSD', '145.50')
     
-    html_content = f"""
+    html = f"""
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>TradeCore - Live Financial Dashboard</title>
+        <title>TradeCore - Financial Dashboard</title>
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
-    <body class="bg-[#0b0f19] text-gray-100 font-sans p-4">
-        <div class="max-w-md mx-auto space-y-4">
-            <!-- Header with Language Selector -->
-            <div class="flex justify-between items-center bg-[#161b22] p-3 rounded-xl border border-gray-800">
-                <h1 class="text-lg font-bold text-green-400">TradeCore 🚀</h1>
-                <select id="langSelect" class="bg-[#21262d] text-xs text-white p-1.5 rounded border border-gray-700 outline-none">
+    <body class="bg-[#0b0f19] text-gray-100 font-sans p-3">
+        <div class="max-w-md mx-auto space-y-3">
+            <!-- Top Bar with Language Dropdown -->
+            <div class="flex justify-between items-center bg-[#161b22] p-2.5 rounded-xl border border-gray-800">
+                <span class="text-xs font-bold text-green-400">⚡ TradeCore Live</span>
+                <select id="lang" class="bg-[#0b0f19] text-xs text-white p-1 rounded border border-gray-700">
                     <option value="en">English</option>
                     <option value="hi">हिंदी (Hindi)</option>
                     <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
                 </select>
             </div>
 
-            <!-- Wallet Card -->
-            <div class="bg-[#161b22] p-4 rounded-xl border border-gray-800">
-                <p class="text-xs text-gray-400" data-translate="wallet">Available Wallet Balance</p>
-                <h2 class="text-2xl font-black text-green-400 mt-1">₹10,000.00</h2>
-                <div class="flex gap-2 mt-3">
-                    <a href="https://www.delta.exchange" target="_blank" class="flex-1 bg-green-600 hover:bg-green-500 text-black font-bold text-center py-2 rounded-lg text-xs" data-translate="deposit">Deposit</a>
-                    <a href="https://www.delta.exchange" target="_blank" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-bold text-center py-2 rounded-lg text-xs border border-gray-700" data-translate="withdraw">Withdraw</a>
+            <!-- Header Text -->
+            <div>
+                <h1 class="text-xl font-black text-white" data-t="title">Good morning, operator.</h1>
+                <p class="text-xs text-gray-400" data-t="subtitle">Your book, automation, and guardrails in one measured view.</p>
+            </div>
+
+            <!-- Cards Grid -->
+            <div class="grid grid-cols-2 gap-2">
+                <div class="bg-[#161b22] p-3 rounded-xl border border-gray-800">
+                    <p class="text-[10px] text-gray-400" data-t="wallet">WALLET BALANCE</p>
+                    <p class="text-lg font-black text-green-400 mt-1">₹8,534.27</p>
+                </div>
+                <div class="bg-[#161b22] p-3 rounded-xl border border-gray-800">
+                    <p class="text-[10px] text-gray-400" data-t="pnl">TODAY'S P&L</p>
+                    <p class="text-lg font-black text-red-400 mt-1">-₹1,465.73</p>
                 </div>
             </div>
 
-            <!-- Live Market Ticker from Delta Exchange -->
-            <div class="bg-[#161b22] p-4 rounded-xl border border-gray-800">
-                <p class="text-xs text-gray-400 mb-2" data-translate="live_market">Delta Exchange Live Ticker</p>
-                <div class="flex justify-between items-center bg-[#0b0f19] p-3 rounded-lg border border-gray-800">
-                    <span class="font-bold text-sm">Bitcoin (BTC/USD)</span>
-                    <span class="text-green-400 font-mono font-bold">$ {btc_price}</span>
-                </div>
-            </div>
-
-            <!-- Control Hub -->
-            <div class="bg-[#161b22] p-4 rounded-xl border border-gray-800 space-y-3">
-                <p class="text-xs text-gray-400 font-bold" data-translate="control_hub">Trading Channels (Live Control)</p>
-                <div class="flex justify-between items-center bg-[#0b0f19] p-2.5 rounded-lg border border-gray-800">
-                    <div>
-                        <p class="text-xs font-bold">Crypto Channel</p>
-                        <p class="text-[10px] text-gray-500">Auto Safety Watchdog Active</p>
+            <!-- Live Market Pulse (Delta Exchange) -->
+            <div class="bg-[#161b22] p-3 rounded-xl border border-gray-800 space-y-2">
+                <p class="text-[10px] font-bold text-gray-400" data-t="pulse">MARKET PULSE (DELTA EXCHANGE)</p>
+                <div class="grid grid-cols-3 gap-2 text-center">
+                    <div class="bg-[#0b0f19] p-2 rounded border border-gray-800">
+                        <p class="text-[9px] text-gray-400">BTC/USD</p>
+                        <p class="text-xs font-bold text-green-400 font-mono">$ {btc}</p>
                     </div>
-                    <span class="bg-green-900/50 text-green-400 text-[10px] px-2 py-1 rounded font-bold" data-translate="active">ACTIVE</span>
+                    <div class="bg-[#0b0f19] p-2 rounded border border-gray-800">
+                        <p class="text-[9px] text-gray-400">ETH/USD</p>
+                        <p class="text-xs font-bold text-green-400 font-mono">$ {eth}</p>
+                    </div>
+                    <div class="bg-[#0b0f19] p-2 rounded border border-gray-800">
+                        <p class="text-[9px] text-gray-400">SOL/USD</p>
+                        <p class="text-xs font-bold text-green-400 font-mono">$ {sol}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Automated Channels -->
+            <div class="bg-[#161b22] p-3 rounded-xl border border-gray-800 space-y-2">
+                <p class="text-[10px] font-bold text-gray-400" data-t="channels">AUTOMATED CHANNELS</p>
+                <div class="bg-[#0b0f19] p-2.5 rounded-lg border border-gray-800 flex justify-between items-center">
+                    <div>
+                        <p class="text-xs font-bold">Crypto Strategy</p>
+                        <p class="text-[9px] text-gray-500">Live execution active</p>
+                    </div>
+                    <span class="bg-green-900/40 text-green-400 text-[9px] px-2 py-0.5 rounded font-bold">ACTIVE</span>
                 </div>
             </div>
         </div>
 
         <script>
-            // Simple Multi-Language Dictionary
-            const translations = {{
-                en: {{ wallet: "Available Wallet Balance", deposit: "Deposit", withdraw: "Withdraw", live_market: "Delta Exchange Live Ticker", control_hub: "Trading Channels (Live Control)", active: "ACTIVE" }},
-                hi: {{ wallet: "उपलब्ध वॉलेट बैलेंस", deposit: "डिपॉजिट (जमा)", withdraw: "विड्रॉल (निकालें)", live_market: "डेल्टा एक्सचेंज लाइव टिकर", control_hub: "ट्रेडिंग चैनल्स (लाइव कंट्रोल)", active: "सक्रिय" }},
-                pa: {{ wallet: "ਉਪਲਬਧ ਵਾਲਿਟ ਬੈਲੇਂਸ", deposit: "ਜਮ੍ਹਾਂ ਕਰੋ", withdraw: "ਕਢਵਾਓ", live_market: "ਡੈਲਟਾ ਐਕਸਚੇਂਜ ਲਾਈਵ ਟਿਕਰ", control_hub: "ਟਰੇਡਿੰਗ ਚੈਨਲ (ਲਾਈਵ ਕੰਟਰੋਲ)", active: "ਸਰਗਰਮ" }}
+            const dict = {{
+                en: {{ title: "Good morning, operator.", subtitle: "Your book, automation, and guardrails in one measured view.", wallet: "WALLET BALANCE", pnl: "TODAY'S P&L", pulse: "MARKET PULSE (DELTA EXCHANGE)", channels: "AUTOMATED CHANNELS" }},
+                hi: {{ title: "सुप्रभात, ऑपरेटर।", subtitle: "आपका ट्रेड, ऑटोमेशन और सुरक्षा एक ही जगह पर।", wallet: "वॉलेट बैलेंस", pnl: "आज का लाभ/हानि", pulse: "मार्केट पल्स (डेल्टा एक्सचेंज)", channels: "ऑटोमेटेड चैनल्स" }},
+                pa: {{ title: "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, ਓਪਰੇਟਰ।", subtitle: "તੁਹਾਡਾ ਬੈਲੰਸ ਅਤੇ ਆਟੋਮੇਸ਼ਨ ਸਭ ਇੱਕ ਨਜ਼ਰ ਵਿੱਚ।", wallet: "ਵਾਲਿਟ ਬੈਲੰਸ", pnl: "ਅੱਜ ਦਾ ਨੁਕਸਾਨ/ਲਾਭ", pulse: "ਮਾਰਕੀਟ ਪਲਸ (ਡੈਲਟਾ ਐਕਸਚੇਂਜ)", channels: "ਆਟੋਮੇਟਡ ਚੈਨਲ" }}
             }};
-
-            document.getElementById('langSelect').addEventListener('change', function() {{
-                const lang = this.value;
-                document.querySelectorAll('[data-translate]').forEach(el => {{
-                    const key = el.getAttribute('data-translate');
-                    if (translations[lang][key]) {{
-                        el.innerText = translations[lang][key];
-                    }}
+            document.getElementById('lang').addEventListener('change', function() {{
+                const l = this.value;
+                document.querySelectorAll('[data-t]').forEach(el => {{
+                    const k = el.getAttribute('data-t');
+                    if(dict[l][k]) el.innerText = dict[l][k];
                 }});
             }});
         </script>
     </body>
     </html>
     """
-    return render_template_string(html_content, btc_price=btc_price)
+    return html
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000)

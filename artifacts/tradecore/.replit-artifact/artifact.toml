@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "TradeCore"
+description = "A mobile-first trading operations dashboard for live market monitoring, budget controls, safety alerts, and performance history."
+version = "1.0.0"
+id = "artifacts/tradecore"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19935
+
+[services.development]
+run = "pnpm --filter @workspace/tradecore run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/tradecore", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/tradecore/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19935"
+BASE_PATH = "/"

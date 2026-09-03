@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover-border: hsl(var(--popover-border));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+  --font-sans: var(--app-font-sans);
+  --font-mono: var(--app-font-mono);
+  --radius-lg: var(--radius);
+}
+
+:root {
+  --background: 195 15% 7%;
+  --foreground: 70 24% 93%;
+  --border: 186 12% 18%;
+  --input: 186 12% 20%;
+  --ring: 79 83% 60%;
+  --card: 192 14% 10%;
+  --card-foreground: 70 24% 93%;
+  --card-border: 186 12% 17%;
+  --popover: 192 14% 12%;
+  --popover-foreground: 70 24% 93%;
+  --popover-border: 186 12% 22%;
+  --primary: 79 83% 60%;
+  --primary-foreground: 195 15% 7%;
+  --secondary: 190 13% 15%;
+  --secondary-foreground: 70 24% 93%;
+  --muted: 190 13% 14%;
+  --muted-foreground: 188 9% 59%;
+  --accent: 172 61% 47%;
+  --accent-foreground: 195 15% 7%;
+  --destructive: 3 69% 60%;
+  --destructive-foreground: 70 24% 93%;
+  --chart-1: 79 83% 60%;
+  --chart-2: 172 61% 47%;
+  --chart-3: 38 85% 61%;
+  --chart-4: 205 72% 62%;
+  --chart-5: 3 69% 60%;
+  --app-font-sans: 'Space Grotesk', sans-serif;
+  --app-font-mono: 'IBM Plex Mono', monospace;
+  --radius: 0.75rem;
+  --shadow: 0 16px 45px hsl(195 28% 3% / 0.35);
+}
+
+.dark {
+  --background: 195 15% 7%;
+  --foreground: 70 24% 93%;
+  --border: 186 12% 18%;
+  --input: 186 12% 20%;
+  --ring: 79 83% 60%;
+  --card: 192 14% 10%;
+  --card-foreground: 70 24% 93%;
+  --card-border: 186 12% 17%;
+  --popover: 192 14% 12%;
+  --popover-foreground: 70 24% 93%;
+  --popover-border: 186 12% 22%;
+  --primary: 79 83% 60%;
+  --primary-foreground: 195 15% 7%;
+  --secondary: 190 13% 15%;
+  --secondary-foreground: 70 24% 93%;
+  --muted: 190 13% 14%;
+  --muted-foreground: 188 9% 59%;
+  --accent: 172 61% 47%;
+  --accent-foreground: 195 15% 7%;
+  --destructive: 3 69% 60%;
+  --destructive-foreground: 70 24% 93%;
+  --chart-1: 79 83% 60%;
+  --chart-2: 172 61% 47%;
+  --chart-3: 38 85% 61%;
+  --chart-4: 205 72% 62%;
+  --chart-5: 3 69% 60%;
+}
+
+@layer base {
+  * { @apply border-border; }
+  html { background: hsl(var(--background)); }
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    min-width: 320px;
+  }
+  button, a, input, select { -webkit-tap-highlight-color: transparent; }
+}
+
+@layer utilities {
+  .font-mono-app { font-family: var(--app-font-mono); }
+  .panel-grid {
+    background-image: linear-gradient(hsl(186 12% 16% / 0.28) 1px, transparent 1px), linear-gradient(90deg, hsl(186 12% 16% / 0.28) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+  .stagger-in { animation: rise-in 500ms cubic-bezier(.22,1,.36,1) both; }
+  .stagger-1 { animation-delay: 60ms; }
+  .stagger-2 { animation-delay: 120ms; }
+  .stagger-3 { animation-delay: 180ms; }
+  .stagger-4 { animation-delay: 240ms; }
+  .stagger-5 { animation-delay: 300ms; }
+  .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: .45; transform: scale(.92); }
+  50% { opacity: 1; transform: scale(1); }
+}

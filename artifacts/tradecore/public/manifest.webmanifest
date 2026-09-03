@@ -1,0 +1,18 @@
+{
+  "name": "TradeCore",
+  "short_name": "TradeCore",
+  "description": "Guarded live trading operations cockpit.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#101617",
+  "theme_color": "#b9ef57",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -10,6 +10,18 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: dashboard
+    description: Trading operations dashboard
+  - name: market
+    description: Live market quotes
+  - name: channels
+    description: Automation channel controls
+  - name: trades
+    description: Active trades
+  - name: performance
+    description: Historical performance
+  - name: webhooks
+    description: Messaging webhooks
 paths:
   /healthz:
     get:
@@ -24,6 +36,127 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get dashboard summary
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+  /quotes:
+    get:
+      operationId: getQuotes
+      tags: [market]
+      summary: Get current market quotes
+      responses:
+        "200":
+          description: Current quotes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Quote"
+  /channels:
+    get:
+      operationId: getChannels
+      tags: [channels]
+      summary: List automation channels
+      responses:
+        "200":
+          description: Automation channels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Channel"
+  /channels/{id}:
+    patch:
+      operationId: updateChannel
+      tags: [channels]
+      summary: Update a channel budget or active state
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChannelUpdate"
+      responses:
+        "200":
+          description: Updated channel
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Channel"
+        "404":
+          description: Channel not found
+  /trades:
+    get:
+      operationId: getTrades
+      tags: [trades]
+      summary: Get active trades
+      responses:
+        "200":
+          description: Active trades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Trade"
+  /performance:
+    get:
+      operationId: getPerformance
+      tags: [performance]
+      summary: Get historical performance for a period
+      parameters:
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [week, fifteen_days, month, year]
+            default: week
+      responses:
+        "200":
+          description: Historical performance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Performance"
+  /webhooks/whatsapp:
+    post:
+      operationId: receiveWhatsappWebhook
+      tags: [webhooks]
+      summary: Receive an inbound WhatsApp command
+      requestBody:
+        required: false
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/WhatsappWebhookInput"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WhatsappWebhookInput"
+      responses:
+        "200":
+          description: Webhook accepted
+          content:
+            text/plain:
+              schema:
+                type: string
 components:
   schemas:
     HealthStatus:
@@ -33,4 +166,85 @@ components:
           type: string
       required:
         - status
+    Dashboard:
+      type: object
+      required: [walletBalance, dayPnl, dayPnlPercent, activeTrades, winRate, lastUpdated, alertStatus]
+      properties:
+        walletBalance: { type: number }
+        dayPnl: { type: number }
+        dayPnlPercent: { type: number }
+        activeTrades: { type: number }
+        winRate: { type: number }
+        lastUpdated: { type: string, format: date-time }
+        alertStatus: { type: string, enum: [armed, paused, not_configured] }
+    Quote:
+      type: object
+      required: [symbol, name, price, change, changePercent, currency, source, updatedAt]
+      properties:
+        symbol: { type: string }
+        name: { type: string }
+        price: { type: number }
+        change: { type: number }
+        changePercent: { type: number }
+        currency: { type: string }
+        source: { type: string }
+        updatedAt: { type: string, format: date-time }
+    Channel:
+      type: object
+      required: [id, name, description, icon, budget, active, status, accent]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        icon: { type: string }
+        budget: { type: number }
+        active: { type: boolean }
+        status: { type: string, enum: [running, paused, ready] }
+        accent: { type: string }
+    ChannelUpdate:
+      type: object
+      properties:
+        budget: { type: number, minimum: 0 }
+        active: { type: boolean }
+    Trade:
+      type: object
+      required: [id, asset, channel, side, entryPrice, currentPrice, pnl, pnlPercent, status, updatedAt]
+      properties:
+        id: { type: string }
+        asset: { type: string }
+        channel: { type: string }
+        side: { type: string, enum: [BUY, SELL] }
+        entryPrice: { type: number }
+        currentPrice: { type: number }
+        pnl: { type: number }
+        pnlPercent: { type: number }
+        status: { type: string, enum: [watching, protected, executing] }
+        updatedAt: { type: string, format: date-time }
+    PerformancePoint:
+      type: object
+      required: [label, value, wins, trades]
+      properties:
+        label: { type: string }
+        value: { type: number }
+        wins: { type: number }
+        trades: { type: number }
+    Performance:
+      type: object
+      required: [period, winRate, totalReturn, totalTrades, points]
+      properties:
+        period: { type: string }
+        winRate: { type: number }
+        totalReturn: { type: number }
+        totalTrades: { type: number }
+        points:
+          type: array
+          items:
+            $ref: "#/components/schemas/PerformancePoint"
+    WhatsappWebhookInput:
+      type: object
+      properties:
+        Body: { type: string }
+        From: { type: string }
+        To: { type: string }
+        message: { type: string }
 

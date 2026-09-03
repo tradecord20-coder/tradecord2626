@@ -8,13 +8,11 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
     <div class="max-w-6xl mx-auto px-4 py-8">
-        <!-- Header -->
         <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
             <div>
                 <h1 id="app-title" class="text-2xl font-bold text-slate-900">TradeCore - Financial Dashboard</h1>
                 <p id="app-subtitle" class="text-sm text-slate-500">Live Crypto Market Pulse</p>
             </div>
-            <!-- Language Selector -->
             <div class="flex items-center gap-2">
                 <span class="text-sm font-medium text-slate-600">Language:</span>
                 <select id="langSelect" onchange="changeLanguage()" class="bg-slate-100 border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -24,18 +22,13 @@
                 </select>
             </div>
         </header>
-
-        <!-- Main Dashboard Content -->
         <main>
             <div class="flex justify-between items-center mb-6">
                 <h2 id="live-market-heading" class="text-xl font-semibold text-slate-800">Live Market Pulse</h2>
                 <button onclick="loadMarketData()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     <span id="refresh-btn-text">Refresh Data</span>
                 </button>
             </div>
-
-            <!-- Crypto Cards Grid -->
             <div id="crypto-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 text-center py-12">
                     <p class="text-slate-500 animate-pulse">Loading market data...</p>
@@ -43,28 +36,7 @@
             </div>
         </main>
     </div>
-
     <script>
-        let currentLang = 'en';
-
-        async function changeLanguage() {
-            currentLang = document.getElementById('langSelect').value;
-            try {
-                const res = await fetch(`/api/translations?lang=${currentLang}`);
-                const data = await res.json();
-                if (data.status === 'success') {
-                    const t = data.translations;
-                    document.getElementById('app-title').innerText = t.title;
-                    document.getElementById('app-subtitle').innerText = t.subtitle;
-                    document.getElementById('live-market-heading').innerText = t.live_market;
-                    document.getElementById('refresh-btn-text').innerText = t.refresh;
-                    loadMarketData();
-                }
-            } catch (e) {
-                console.error("Translation error:", e);
-            }
-        }
-
         async function loadMarketData() {
             const grid = document.getElementById('crypto-grid');
             try {
@@ -72,41 +44,18 @@
                 const result = await res.json();
                 if (result.status === 'success' && result.data.length > 0) {
                     grid.innerHTML = result.data.map(coin => `
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition">
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <span class="text-xs font-bold px-2 py-1 bg-slate-100 text-slate-600 rounded">${coin.symbol}</span>
-                                    <h3 class="text-lg font-bold text-slate-800 mt-1">${coin.name}</h3>
-                                </div>
-                                <span class="text-xs text-slate-400">${new Date(coin.timestamp).toLocaleTimeString()}</span>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-sm">
-                                    <span class="text-slate-500">Price:</span>
-                                    <span class="font-bold text-slate-900">$${coin.price.toLocaleString()}</span>
-                                </div>
-                                <div class="flex justify-between text-sm">
-                                    <span class="text-slate-500">24h Change:</span>
-                                    <span class="font-semibold ${coin.change_24h >= 0 ? 'text-green-600' : 'text-red-600'}">
-                                        ${coin.change_24h >= 0 ? '+' : ''}${coin.change_24h}%
-                                    </span>
-                                </div>
-                                <div class="flex justify-between text-xs text-slate-400 pt-2 border-t border-slate-500/10">
-                                    <span>High: $${coin.high_24h.toLocaleString()}</span>
-                                    <span>Low: $${coin.low_24h.toLocaleString()}</span>
-                                </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                            <span class="text-xs font-bold px-2 py-1 bg-slate-100 text-slate-600 rounded">${coin.symbol}</span>
+                            <h3 class="text-lg font-bold text-slate-800 mt-1">${coin.name}</h3>
+                            <div class="mt-4 space-y-2">
+                                <div class="flex justify-between text-sm"><span class="text-slate-500">Price:</span><span class="font-bold">$${coin.price.toLocaleString()}</span></div>
+                                <div class="flex justify-between text-sm"><span class="text-slate-500">24h Change:</span><span class="font-semibold ${coin.change_24h >= 0 ? 'text-green-600' : 'text-red-600'}">${coin.change_24h}%</span></div>
                             </div>
                         </div>
                     `).join('');
-                } else {
-                    grid.innerHTML = `<div class="col-span-3 bg-white p-6 rounded-xl text-center text-red-500">Failed to load market data</div>`;
                 }
-            } catch (e) {
-                grid.innerHTML = `<div class="col-span-3 bg-white p-6 rounded-xl text-center text-red-500">Error connecting to API</div>`;
-            }
+            } catch (e) { console.error(e); }
         }
-
-        // Initial load
         loadMarketData();
     </script>
 </body>

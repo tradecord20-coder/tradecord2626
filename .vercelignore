@@ -1,0 +1,19 @@
+# Root-level vercel ignore - minimize context for faster builds
+.git
+.gitignore
+node_modules
+.pnpm-store
+**/dist
+.env.local
+.env.*.local
+coverage
+.DS_Store
+*.log
+.vscode
+.idea
+
+# Keep only the tradecore artifact needed for deployment
+lib/
+scripts/
+artifacts/mockup-sandbox/
+artifacts/api-server/

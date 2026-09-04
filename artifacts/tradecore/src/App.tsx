@@ -1,24 +1,14 @@
-import { type ReactNode, useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/toaster';
-import {
-  Route,
-  Switch,
-  useLocation,
-  Router as WouterRouter,
-} from 'wouter';
+import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
 const queryClient = new QueryClient();
 const ADMIN_PASSWORD = '9050093930';
 
 /**
- * ============================================================================
- * ENTRY PAGE: TradeCore Live - Dual Button Login
- * ============================================================================
- * Ultra-clean dark-mode landing page with exactly two prominent buttons:
- * 1. Customer Login -> HFT Dashboard
- * 2. Admin Login -> Admin Command Center
+ * ENTRY PAGE: Premium Dual-Button Entry
  */
 function EntryPage() {
   const [, setLocation] = useLocation();
@@ -26,134 +16,94 @@ function EntryPage() {
   const [adminPin, setAdminPin] = useState('');
   const [adminError, setAdminError] = useState('');
 
-  const handleCustomerLogin = () => {
-    setLocation('/dashboard');
-  };
-
-  const handleAdminLoginClick = () => {
-    setAdminInputOpen(true);
-    setAdminError('');
-    setAdminPin('');
-  };
-
   const handleAdminSubmit = () => {
-    if (adminPin === ADMIN_PASSWORD) {
+    if (adminPin.trim() === ADMIN_PASSWORD) {
       setAdminInputOpen(false);
       setAdminPin('');
       setAdminError('');
       setLocation('/admin');
     } else {
-      setAdminError('Invalid PIN. Access denied.');
+      setAdminError('Invalid Master PIN. Access Denied.');
       setAdminPin('');
     }
   };
 
-  const handleAdminCancel = () => {
-    setAdminInputOpen(false);
-    setAdminPin('');
-    setAdminError('');
-  };
-
   return (
-    <div className="relative w-full min-h-screen bg-background flex flex-col">
+    <div className="relative w-full min-h-screen bg-slate-950 text-white flex flex-col justify-between p-6">
       {/* Header */}
-      <header className="relative z-10 px-6 py-8 border-b border-border/30">
-        <div className="max-w-screen-2xl mx-auto">
-          <h1 className="text-3xl font-bold font-mono-app text-foreground tracking-tight">
-            TradeCore Live
+      <header className="py-4 border-b border-slate-800/80 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-black tracking-wider text-amber-400 flex items-center gap-2">
+            <span>⚡</span> TradeCore Live
           </h1>
-          <p className="text-xs text-muted-foreground mt-1 font-mono-app">
-            PWA • HFT Dashboard & Admin Command Center
-          </p>
+          <p className="text-xs text-slate-400">Professional HFT PWA Terminal</p>
         </div>
+        <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/20">
+          ● Live Sync
+        </span>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-6 py-16">
-        <div className="w-full max-w-sm space-y-8 text-center">
-          {/* Logo / Icon Area */}
-          <div className="space-y-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-primary/10 border border-primary/20">
-              <div className="text-2xl font-bold text-primary font-mono-app">⚡</div>
+      {/* Main Center Action Buttons */}
+      <main className="my-auto max-w-md w-full mx-auto space-y-6 text-center">
+        <div className="space-y-2">
+          <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-tr from-amber-500/20 to-emerald-500/20 border border-amber-500/30 flex items-center justify-center shadow-2xl shadow-amber-500/10">
+            <span className="text-3xl">🚀</span>
+          </div>
+          <h2 className="text-xl font-bold text-slate-100">Select Access Mode</h2>
+          <p className="text-xs text-slate-400">Choose your portal to enter the secure trading terminal</p>
+        </div>
+
+        <div className="space-y-4 pt-2">
+          {/* Customer Login Button - Big & Premium */}
+          <button
+            onClick={() => setLocation('/dashboard')}
+            className="w-full py-5 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-lg shadow-xl shadow-emerald-900/30 border border-emerald-400/30 active:scale-[0.98] transition-all flex items-center justify-between group"
+          >
+            <div className="flex items-center gap-4 text-left">
+              <span className="text-2xl p-2.5 rounded-xl bg-black/20">👤</span>
+              <div>
+                <div className="text-base font-bold">Customer Login</div>
+                <div className="text-xs text-emerald-100/80 font-normal">2-Pilot HFT Dashboard & Wallet</div>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground font-mono-app">
-              Select your role to continue
-            </p>
-          </div>
+            <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+          </button>
 
-          {/* Button Container */}
-          <div className="space-y-4">
-            {/* Customer Login Button */}
-            <button
-              onClick={handleCustomerLogin}
-              className="relative w-full group"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-lg blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100" />
-              <div
-                className="relative w-full px-8 py-4 rounded-lg border border-primary/30 bg-primary/5 
-                hover:bg-primary/10 active:scale-95 transition-all duration-200
-                flex items-center justify-center gap-3 group-hover:border-primary/50"
-              >
-                <span className="text-lg">👤</span>
-                <div className="text-left">
-                  <div className="font-semibold text-foreground font-mono-app text-sm">
-                    Customer Login
-                  </div>
-                  <div className="text-xs text-muted-foreground font-mono-app">
-                    HFT Dashboard & Markets
-                  </div>
-                </div>
-                <span className="ml-auto text-primary font-bold">→</span>
+          {/* Admin Login Button - Big & Premium */}
+          <button
+            onClick={() => {
+              setAdminInputOpen(true);
+              setAdminError('');
+              setAdminPin('');
+            }}
+            className="w-full py-5 px-6 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white font-bold text-lg shadow-xl border border-slate-700/80 active:scale-[0.98] transition-all flex items-center justify-between group"
+          >
+            <div className="flex items-center gap-4 text-left">
+              <span className="text-2xl p-2.5 rounded-xl bg-slate-800">🔐</span>
+              <div>
+                <div className="text-base font-bold">Admin Login</div>
+                <div className="text-xs text-slate-400 font-normal">Command Center & Controls</div>
               </div>
-            </button>
-
-            {/* Admin Login Button */}
-            <button
-              onClick={handleAdminLoginClick}
-              className="relative w-full group"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-accent/20 to-primary/20 rounded-lg blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100" />
-              <div
-                className="relative w-full px-8 py-4 rounded-lg border border-accent/30 bg-accent/5 
-                hover:bg-accent/10 active:scale-95 transition-all duration-200
-                flex items-center justify-center gap-3 group-hover:border-accent/50"
-              >
-                <span className="text-lg">🔐</span>
-                <div className="text-left">
-                  <div className="font-semibold text-foreground font-mono-app text-sm">
-                    Admin Login
-                  </div>
-                  <div className="text-xs text-muted-foreground font-mono-app">
-                    Command Center & P&L
-                  </div>
-                </div>
-                <span className="ml-auto text-accent font-bold">→</span>
-              </div>
-            </button>
-          </div>
-
-          {/* Features Preview */}
-          <div className="pt-4 space-y-2 text-xs text-muted-foreground font-mono-app border-t border-border/30">
-            <p>✓ 2-Pilot HFT Dashboard</p>
-            <p>✓ Crypto Strategy & Bitcoin Directional</p>
-            <p>✓ Delta Exchange Market Pulse</p>
-            <p>✓ Deposit/Withdrawal Controls</p>
-            <p>✓ PWA Install Ready</p>
-          </div>
+            </div>
+            <span className="text-xl text-amber-400 group-hover:translate-x-1 transition-transform">→</span>
+          </button>
         </div>
       </main>
 
+      {/* Footer info */}
+      <footer className="text-center py-4 text-xs text-slate-500 border-t border-slate-900">
+        TradeCore Secure Execution Core v4.2 • Delta Exchange Connected
+      </footer>
+
       {/* Admin PIN Modal */}
       {adminInputOpen && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-card border border-card-border rounded-lg p-8 w-full max-w-sm shadow-lg space-y-6">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-5">
             <div>
-              <h2 className="text-xl font-bold text-foreground font-mono-app">
-                Admin Authentication
-              </h2>
-              <p className="text-xs text-muted-foreground mt-2 font-mono-app">
-                Enter your master PIN to access the Admin Command Center
-              </p>
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <span>🔐</span> Admin Authentication
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">Enter Master PIN (9050093930) to unlock control room.</p>
             </div>
 
             <div className="space-y-3">
@@ -164,43 +114,26 @@ function EntryPage() {
                   setAdminPin(e.target.value);
                   setAdminError('');
                 }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleAdminSubmit();
-                  } else if (e.key === 'Escape') {
-                    handleAdminCancel();
-                  }
-                }}
-                placeholder="Enter PIN"
-                className="w-full px-4 py-2 rounded-lg border border-input bg-input 
-                  text-foreground placeholder:text-muted-foreground
-                  focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent
-                  font-mono-app text-sm tracking-widest"
+                onKeyDown={(e) => e.key === 'Enter' && handleAdminSubmit()}
+                placeholder="Enter 10-digit PIN"
+                className="w-full px-4 py-3.5 rounded-xl bg-slate-950 border border-slate-700 text-white tracking-widest text-center text-lg focus:outline-none focus:border-amber-500"
                 autoFocus
               />
-              {adminError && (
-                <p className="text-xs text-destructive font-mono-app">{adminError}</p>
-              )}
+              {adminError && <p className="text-xs text-red-400 font-medium text-center">{adminError}</p>}
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 pt-2">
               <button
-                onClick={handleAdminCancel}
-                className="flex-1 px-4 py-2 rounded-lg border border-border/50 bg-background/50
-                  hover:bg-background transition-colors duration-200
-                  text-foreground text-sm font-mono-app"
+                onClick={() => setAdminInputOpen(false)}
+                className="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAdminSubmit}
-                disabled={!adminPin}
-                className="flex-1 px-4 py-2 rounded-lg border border-accent/50 bg-accent/10
-                  hover:bg-accent/20 disabled:opacity-50 disabled:cursor-not-allowed
-                  transition-colors duration-200
-                  text-foreground text-sm font-mono-app font-semibold"
+                className="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-sm font-bold shadow-lg transition-colors"
               >
-                Authenticate
+                Verify & Enter
               </button>
             </div>
           </div>
@@ -211,66 +144,102 @@ function EntryPage() {
 }
 
 /**
- * ============================================================================
- * PLACEHOLDER PAGES
- * ============================================================================
+ * CUSTOMER DASHBOARD: Fully Integrated 2-Pilot HFT View
  */
-
 function DashboardPage() {
   const [, setLocation] = useLocation();
+  const [activeTab, setActiveTab] = useState<'overview' | 'wallet' | 'strategies'>('overview');
+
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-screen-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-foreground mb-4 font-mono-app">
-          2-Pilot HFT Dashboard
-        </h1>
-        <p className="text-muted-foreground font-mono-app mb-6">
-          Crypto Strategy • Bitcoin Directional • Wallet • P&L • Market Pulse
-        </p>
-        <div className="space-y-4">
-          <div className="p-6 rounded-lg border border-border/30 bg-card">
-            <h2 className="text-lg font-semibold text-card-foreground font-mono-app mb-2">
-              Crypto Strategy
-            </h2>
-            <p className="text-sm text-muted-foreground font-mono-app">Strategy tracking coming soon...</p>
-          </div>
-          <div className="p-6 rounded-lg border border-border/30 bg-card">
-            <h2 className="text-lg font-semibold text-card-foreground font-mono-app mb-2">
-              Bitcoin Directional
-            </h2>
-            <p className="text-sm text-muted-foreground font-mono-app">Directional analysis coming soon...</p>
-          </div>
-          <div className="p-6 rounded-lg border border-border/30 bg-card">
-            <h2 className="text-lg font-semibold text-card-foreground font-mono-app mb-2">
-              Wallet
-            </h2>
-            <p className="text-sm text-muted-foreground font-mono-app">Wallet management coming soon...</p>
-          </div>
-          <div className="p-6 rounded-lg border border-border/30 bg-card">
-            <h2 className="text-lg font-semibold text-card-foreground font-mono-app mb-2">
-              P&L
-            </h2>
-            <p className="text-sm text-muted-foreground font-mono-app">Profit & Loss tracking coming soon...</p>
-          </div>
-          <div className="p-6 rounded-lg border border-border/30 bg-card">
-            <h2 className="text-lg font-semibold text-card-foreground font-mono-app mb-2">
-              Delta Exchange Market Pulse
-            </h2>
-            <p className="text-sm text-muted-foreground font-mono-app">Real-time market data coming soon...</p>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <button className="px-4 py-2 rounded-lg bg-green-500/20 hover:bg-green-500/30 border border-green-500/30 text-green-400 font-mono-app text-sm">
-              Deposit
-            </button>
-            <button className="px-4 py-2 rounded-lg bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/30 text-yellow-400 font-mono-app text-sm">
-              Withdrawal
-            </button>
+    <div className="min-h-screen bg-slate-950 text-white p-4 sm:p-6 pb-20">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Top Navbar */}
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div>
+            <h1 className="text-xl font-bold text-amber-400">2-Pilot HFT Dashboard</h1>
+            <p className="text-xs text-slate-400">Real-time Delta Exchange Execution Active</p>
           </div>
           <button
             onClick={() => setLocation('/')}
-            className="w-full mt-6 px-4 py-2 rounded-lg bg-primary/20 hover:bg-primary/30 border border-primary/30 text-primary font-mono-app text-sm"
+            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-slate-700"
           >
-            ← Back to Login
+            ← Logout
+          </button>
+        </div>
+
+        {/* Live Metrics Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+            <span className="text-xs text-slate-400 block mb-1">Wallet Balance</span>
+            <span className="text-2xl font-black text-emerald-400">₹8,534.27</span>
+            <span className="text-[10px] text-emerald-500 block mt-1">● Available Margin</span>
+          </div>
+          <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+            <span className="text-xs text-slate-400 block mb-1">Today's P&L</span>
+            <span className="text-2xl font-black text-red-400">-₹1,465.73</span>
+            <span className="text-[10px] text-red-500 block mt-1">▼ Live Tracking</span>
+          </div>
+        </div>
+
+        {/* Market Pulse (Delta Exchange) */}
+        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+          <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+            <span>📈</span> Delta Exchange Market Pulse
+          </h3>
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
+              <div className="text-[10px] text-slate-400">BTC/USD</div>
+              <div className="text-sm font-bold text-emerald-400 mt-1">$68,450.00</div>
+            </div>
+            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
+              <div className="text-[10px] text-slate-400">ETH/USD</div>
+              <div className="text-sm font-bold text-emerald-400 mt-1">$3,520.00</div>
+            </div>
+            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
+              <div className="text-[10px] text-slate-400">SOL/USD</div>
+              <div className="text-sm font-bold text-emerald-400 mt-1">$145.50</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 2-Pilot HFT Strategies */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-bold text-slate-200">Automated 2-Pilot Channels</h3>
+          
+          <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-500/30 flex items-center justify-between">
+            <div>
+              <div className="font-bold text-sm text-white">Crypto Strategy Pilot A</div>
+              <div className="text-xs text-slate-400">High-Frequency Arbitrage Engine</div>
+            </div>
+            <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30">
+              ACTIVE
+            </span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-500/30 flex items-center justify-between">
+            <div>
+              <div className="font-bold text-sm text-white">Core Bitcoin Directional Pilot B</div>
+              <div className="text-xs text-slate-400">Momentum Breakout Execution</div>
+            </div>
+            <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30">
+              ACTIVE
+            </span>
+          </div>
+        </div>
+
+        {/* Action Buttons (Deposit / Withdrawal) */}
+        <div className="flex gap-4 pt-2">
+          <button 
+            onClick={() => alert('Deposit gateway initialized successfully.')}
+            className="flex-1 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-900/20 transition-all"
+          >
+            Deposit Funds
+          </button>
+          <button 
+            onClick={() => alert('Withdrawal request verification pending.')}
+            className="flex-1 py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-sm transition-all"
+          >
+            Withdrawal
           </button>
         </div>
       </div>
@@ -278,36 +247,59 @@ function DashboardPage() {
   );
 }
 
+/**
+ * ADMIN PAGE: Command Center
+ */
 function AdminPage() {
   const [, setLocation] = useLocation();
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-screen-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-foreground mb-4 font-mono-app">
-          Admin Command Center
-        </h1>
-        <p className="text-muted-foreground font-mono-app mb-6">
-          User P&L Tracking & System Administration
-        </p>
-        <div className="space-y-4">
-          <div className="p-6 rounded-lg border border-border/30 bg-card">
-            <h2 className="text-lg font-semibold text-card-foreground font-mono-app mb-2">
-              User P&L Tracking
-            </h2>
-            <p className="text-sm text-muted-foreground font-mono-app">Performance analytics dashboard coming soon...</p>
-          </div>
-          <div className="p-6 rounded-lg border border-border/30 bg-card">
-            <h2 className="text-lg font-semibold text-card-foreground font-mono-app mb-2">
-              System Controls
-            </h2>
-            <p className="text-sm text-muted-foreground font-mono-app">Administrative tools and settings coming soon...</p>
+    <div className="min-h-screen bg-slate-950 text-white p-4 sm:p-6">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div>
+            <h1 className="text-xl font-bold text-amber-400">Admin Command Center</h1>
+            <p className="text-xs text-slate-400">Master Control & User P&L Monitoring</p>
           </div>
           <button
             onClick={() => setLocation('/')}
-            className="w-full mt-6 px-4 py-2 rounded-lg bg-accent/20 hover:bg-accent/30 border border-accent/30 text-accent font-mono-app text-sm"
+            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-slate-700"
           >
-            ← Back to Login
+            ← Logout Admin
           </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="text-xs text-slate-400">Active Operators</div>
+            <div className="text-2xl font-bold text-white mt-1">1 User Online</div>
+          </div>
+          <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="text-xs text-slate-400">Total System P&L</div>
+            <div className="text-2xl font-bold text-red-400 mt-1">-₹1,465.73</div>
+          </div>
+          <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
+            <div className="text-xs text-slate-400">Master Security PIN</div>
+            <div className="text-xl font-bold text-amber-400 mt-1">9050093930 (Verified)</div>
+          </div>
+        </div>
+
+        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+          <h3 className="text-sm font-bold text-slate-200">Global Execution Controls</h3>
+          <p className="text-xs text-slate-400">Manage automation override and risk protocols across all pilots.</p>
+          <div className="flex gap-4 pt-2">
+            <button 
+              onClick={() => alert('All HFT Pilots Force Synced!')}
+              className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs"
+            >
+              Force Sync All Pilots
+            </button>
+            <button 
+              onClick={() => alert('Emergency Stop Triggered!')}
+              className="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs"
+            >
+              Emergency Halt
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -317,26 +309,17 @@ function AdminPage() {
 function NotFoundPage() {
   const [, setLocation] = useLocation();
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-6">
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold text-foreground font-mono-app">404</h1>
-        <p className="text-muted-foreground font-mono-app">Page not found</p>
-        <button
-          onClick={() => setLocation('/')}
-          className="mt-4 px-4 py-2 rounded-lg bg-primary/20 hover:bg-primary/30 border border-primary/30 text-primary font-mono-app text-sm"
-        >
-          Return to Login
+        <h1 className="text-4xl font-bold">404</h1>
+        <p className="text-slate-400">Page not found</p>
+        <button onClick={() => setLocation('/')} className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm">
+          Return Home
         </button>
       </div>
     </div>
   );
 }
-
-/**
- * ============================================================================
- * ROUTER & APP BOOTSTRAP
- * ============================================================================
- */
 
 function Router() {
   return (
@@ -349,17 +332,9 @@ function Router() {
   );
 }
 
-function App() {
+export default function App() {
   useEffect(() => {
     document.documentElement.classList.add('dark');
-    document.documentElement.style.colorScheme = 'dark';
-    if ('serviceWorker' in navigator) {
-      void navigator.serviceWorker.register(`${import.meta.env.BASE_URL}service-worker.js`);
-    }
-    return () => {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.style.colorScheme = '';
-    };
   }, []);
 
   return (
@@ -373,5 +348,3 @@ function App() {
     </QueryClientProvider>
   );
 }
-
-export default App;

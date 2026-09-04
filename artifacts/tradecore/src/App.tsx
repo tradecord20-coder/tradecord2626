@@ -7,7 +7,6 @@ import {
   Switch,
   useLocation,
   Router as WouterRouter,
-  useRoute,
 } from 'wouter';
 
 const queryClient = new QueryClient();
@@ -223,27 +222,53 @@ function DashboardPage() {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-screen-2xl mx-auto">
         <h1 className="text-3xl font-bold text-foreground mb-4 font-mono-app">
-          Customer Dashboard
+          2-Pilot HFT Dashboard
         </h1>
         <p className="text-muted-foreground font-mono-app mb-6">
-          2-Pilot HFT Dashboard • Crypto Strategy & Bitcoin Directional
+          Crypto Strategy • Bitcoin Directional • Wallet • P&L • Market Pulse
         </p>
         <div className="space-y-4">
+          <div className="p-6 rounded-lg border border-border/30 bg-card">
+            <h2 className="text-lg font-semibold text-card-foreground font-mono-app mb-2">
+              Crypto Strategy
+            </h2>
+            <p className="text-sm text-muted-foreground font-mono-app">Strategy tracking coming soon...</p>
+          </div>
+          <div className="p-6 rounded-lg border border-border/30 bg-card">
+            <h2 className="text-lg font-semibold text-card-foreground font-mono-app mb-2">
+              Bitcoin Directional
+            </h2>
+            <p className="text-sm text-muted-foreground font-mono-app">Directional analysis coming soon...</p>
+          </div>
+          <div className="p-6 rounded-lg border border-border/30 bg-card">
+            <h2 className="text-lg font-semibold text-card-foreground font-mono-app mb-2">
+              Wallet
+            </h2>
+            <p className="text-sm text-muted-foreground font-mono-app">Wallet management coming soon...</p>
+          </div>
+          <div className="p-6 rounded-lg border border-border/30 bg-card">
+            <h2 className="text-lg font-semibold text-card-foreground font-mono-app mb-2">
+              P&L
+            </h2>
+            <p className="text-sm text-muted-foreground font-mono-app">Profit & Loss tracking coming soon...</p>
+          </div>
           <div className="p-6 rounded-lg border border-border/30 bg-card">
             <h2 className="text-lg font-semibold text-card-foreground font-mono-app mb-2">
               Delta Exchange Market Pulse
             </h2>
             <p className="text-sm text-muted-foreground font-mono-app">Real-time market data coming soon...</p>
           </div>
-          <div className="p-6 rounded-lg border border-border/30 bg-card">
-            <h2 className="text-lg font-semibold text-card-foreground font-mono-app mb-2">
-              Deposit / Withdrawal
-            </h2>
-            <p className="text-sm text-muted-foreground font-mono-app">Fund management controls coming soon...</p>
+          <div className="grid grid-cols-2 gap-4">
+            <button className="px-4 py-2 rounded-lg bg-green-500/20 hover:bg-green-500/30 border border-green-500/30 text-green-400 font-mono-app text-sm">
+              Deposit
+            </button>
+            <button className="px-4 py-2 rounded-lg bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/30 text-yellow-400 font-mono-app text-sm">
+              Withdrawal
+            </button>
           </div>
           <button
             onClick={() => setLocation('/')}
-            className="mt-6 px-4 py-2 rounded-lg bg-primary/20 hover:bg-primary/30 border border-primary/30 text-primary font-mono-app text-sm"
+            className="w-full mt-6 px-4 py-2 rounded-lg bg-primary/20 hover:bg-primary/30 border border-primary/30 text-primary font-mono-app text-sm"
           >
             ← Back to Login
           </button>
@@ -279,7 +304,7 @@ function AdminPage() {
           </div>
           <button
             onClick={() => setLocation('/')}
-            className="mt-6 px-4 py-2 rounded-lg bg-accent/20 hover:bg-accent/30 border border-accent/30 text-accent font-mono-app text-sm"
+            className="w-full mt-6 px-4 py-2 rounded-lg bg-accent/20 hover:bg-accent/30 border border-accent/30 text-accent font-mono-app text-sm"
           >
             ← Back to Login
           </button>

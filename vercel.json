@@ -3,7 +3,14 @@
   "public": true,
   "cleanUrls": true,
   "trailingSlash": false,
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/artifacts/tradecore/dist/index.html" }
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/artifacts/tradecore/dist/$1" },
+    { "src": "/.*", "dest": "/artifacts/tradecore/dist/index.html" }
   ]
 }

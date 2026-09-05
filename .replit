@@ -3,3 +3,6 @@ run = "pnpm run dev"
 
 [[ports]]
 localPort = 3000
+
+[nix]
+packages = ["vite"]

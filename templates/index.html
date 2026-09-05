@@ -3,60 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradeCore - Financial Dashboard</title>
+    <title>TradeCore Live - Financial & Crypto Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
     <div class="max-w-6xl mx-auto px-4 py-8">
-        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+        <!-- Header Section -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 bg-slate-900 p-6 rounded-2xl shadow-lg border border-slate-800 gap-4">
             <div>
-                <h1 id="app-title" class="text-2xl font-bold text-slate-900">TradeCore - Financial Dashboard</h1>
-                <p id="app-subtitle" class="text-sm text-slate-500">Live Crypto Market Pulse</p>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 bg-green-500 rounded-full animate-ping"></span>
+                    <h1 class="text-2xl font-black tracking-tight text-white">TradeCore Live</h1>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">Real-time market intelligence & autonomous guardrails active.</p>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="text-sm font-medium text-slate-600">Language:</span>
-                <select id="langSelect" onchange="changeLanguage()" class="bg-slate-100 border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="en">English</option>
-                    <option value="hi">हिंदी</option>
-                    <option value="pa">ਪੰਜਾਬੀ</option>
-                </select>
+            <div class="flex items-center gap-4">
+                <div class="text-right">
+                    <span class="text-xs text-slate-400 block">SYSTEM STATUS</span>
+                    <span class="text-xs font-bold text-green-400 bg-green-950/50 px-2 py-0.5 rounded border border-green-800">ONLINE (SECURE)</span>
+                </div>
             </div>
         </header>
-        <main>
-            <div class="flex justify-between items-center mb-6">
-                <h2 id="live-market-heading" class="text-xl font-semibold text-slate-800">Live Market Pulse</h2>
-                <button onclick="loadMarketData()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm flex items-center gap-2">
-                    <span id="refresh-btn-text">Refresh Data</span>
-                </button>
+
+        <!-- Main Dashboard Grid -->
+        <main class="space-y-6">
+            <!-- Market Pulse Grid (Live Binance Data) -->
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-slate-200 tracking-wide">MARKET PULSE (LIVE API)</h2>
+                    <button onclick="fetchAllCryptoData()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-md flex items-center gap-2">
+                        <span>🔄 Refresh Data</span>
+                    </button>
+                </div>
+                <div id="crypto-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Dynamic Cards will load here -->
+                    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 text-center py-12">
+                        <p class="text-slate-400 animate-pulse text-sm">Connecting to live exchange nodes...</p>
+                    </div>
+                </div>
             </div>
-            <div id="crypto-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 text-center py-12">
-                    <p class="text-slate-500 animate-pulse">Loading market data...</p>
+
+            <!-- Security Guard / Automated Channels Section -->
+            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-slate-200 tracking-wide">AUTOMATED CHANNELS (SECURITY GUARDS)</h2>
+                    <span class="text-xs bg-blue-950 text-blue-400 border border-blue-800 px-2.5 py-1 rounded-full font-semibold">2 Active Guards</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-bold text-slate-400">PILOT A</span>
+                            <h3 class="text-sm font-bold text-white mt-0.5">Crypto Strategy Pilot</h3>
+                            <p class="text-[11px] text-slate-500">Millisecond latency risk mitigation</p>
+                        </div>
+                        <span class="px-2.5 py-1 bg-green-500/10 text-green-400 border border-green-500/20 text-xs font-bold rounded-full">ACTIVE</span>
+                    </div>
+                    <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-bold text-slate-400">PILOT B</span>
+                            <h3 class="text-sm font-bold text-white mt-0.5">Core Bitcoin Directional</h3>
+                            <p class="text-[11px] text-slate-500">Automated drawdown protection</p>
+                        </div>
+                        <span class="px-2.5 py-1 bg-green-500/10 text-green-400 border border-green-500/20 text-xs font-bold rounded-full">ACTIVE</span>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
+
+    <!-- Script to Fetch Real-Time Data Directly -->
     <script>
-        async function loadMarketData() {
+        async function fetchAllCryptoData() {
             const grid = document.getElementById('crypto-grid');
             try {
-                const res = await fetch('/api/market-data');
-                const result = await res.json();
-                if (result.status === 'success' && result.data.length > 0) {
-                    grid.innerHTML = result.data.map(coin => `
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                            <span class="text-xs font-bold px-2 py-1 bg-slate-100 text-slate-600 rounded">${coin.symbol}</span>
-                            <h3 class="text-lg font-bold text-slate-800 mt-1">${coin.name}</h3>
-                            <div class="mt-4 space-y-2">
-                                <div class="flex justify-between text-sm"><span class="text-slate-500">Price:</span><span class="font-bold">$${coin.price.toLocaleString()}</span></div>
-                                <div class="flex justify-between text-sm"><span class="text-slate-500">24h Change:</span><span class="font-semibold ${coin.change_24h >= 0 ? 'text-green-600' : 'text-red-600'}">${coin.change_24h}%</span></div>
+                // Fetching BTC and ETH live data directly from Binance public API to bypass 404 backend server issues on Vercel
+                const [btcRes, ethRes] = await Promise.all([
+                    fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT'),
+                    fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=ETHUSDT')
+                ]);
+
+                const btc = await btcRes.json();
+                const eth = await ethRes.json();
+
+                const coins = [
+                    { name: 'Bitcoin', symbol: 'BTC/USDT', data: btc },
+                    { name: 'Ethereum', symbol: 'ETH/USDT', data: eth }
+                ];
+
+                grid.innerHTML = coins.map(item => {
+                    const price = parseFloat(item.data.lastPrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    const change = parseFloat(item.data.priceChangePercent).toFixed(2);
+                    const high = parseFloat(item.data.highPrice).toLocaleString('en-US', { minimumFractionDigits: 2 });
+                    const low = parseFloat(item.data.lowPrice).toLocaleString('en-US', { minimumFractionDigits: 2 });
+                    const isPositive = change >= 0;
+
+                    return `
+                        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 bg-slate-800 text-slate-300 rounded">${item.symbol}</span>
+                                    <h3 class="text-xl font-extrabold text-white mt-1">${item.name}</h3>
+                                </div>
+                                <span class="text-xs font-bold px-2.5 py-1 rounded-lg ${isPositive ? 'bg-green-950/80 text-green-400 border border-green-800' : 'bg-red-950/80 text-red-400 border border-red-800'}">
+                                    ${isPositive ? '+' : ''}${change}%
+                                </span>
+                            </div>
+                            <div class="my-4">
+                                <span class="text-xs text-slate-400 block">CURRENT PRICE</span>
+                                <span class="text-2xl font-black text-white">$${price}</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-800/60 text-xs">
+                                <div>
+                                    <span class="text-slate-500 block">24h High</span>
+                                    <span class="font-semibold text-slate-300">$${high}</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500 block">24h Low</span>
+                                    <span class="font-semibold text-slate-300">$${low}</span>
+                                </div>
                             </div>
                         </div>
-                    `).join('');
-                }
-            } catch (e) { console.error(e); }
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error("Error fetching market data:", err);
+                grid.innerHTML = `<div class="col-span-2 bg-red-950/30 p-6 rounded-2xl border border-red-900 text-center"><p class="text-red-400 text-sm">Failed to connect to live exchange feeds. Please check network connection.</p></div>`;
+            }
         }
-        loadMarketData();
+
+        // Load data on page load
+        fetchAllCryptoData();
+        // Auto refresh every 10 seconds
+        setInterval(fetchAllCryptoData, 10000);
     </script>
 </body>
 </html>

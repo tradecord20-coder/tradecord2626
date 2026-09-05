@@ -1,46 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd artifacts/tradecore && npm run build",
-  "outputDirectory": "artifacts/tradecore/dist/public",
-  "env": {
-    "PORT": "3000",
-    "BASE_PATH": "/"
-  },
-  "routes": [
-    {
-      "src": "/favicon.svg",
-      "dest": "/favicon.svg",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "src": "/manifest.webmanifest",
-      "dest": "/manifest.webmanifest",
-      "headers": {
-        "cache-control": "public, max-age=3600"
-      }
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "src": "/index.html",
-      "dest": "/index.html",
-      "headers": {
-        "cache-control": "no-cache, no-store, must-revalidate"
-      }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html",
-      "headers": {
-        "cache-control": "no-cache, no-store, must-revalidate"
-      }
-    }
+  "builds": [
+    { "src": "artifacts/tradecore/package.json", "use": "@vercel/static-build", "config": { "distDir": "dist" } }
   ]
 }

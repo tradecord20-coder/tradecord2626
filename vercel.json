@@ -2,14 +2,8 @@
   "version": 2,
   "cleanUrls": true,
   "trailingSlash": false,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/artifacts/tradecore/dist/$1" },
-    { "src": "/.*", "dest": "/artifacts/tradecore/dist/index.html" }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/artifacts/tradecore/dist/$1" },
+    { "source": "/.*", "destination": "/artifacts/tradecore/dist/index.html" }
   ]
 }

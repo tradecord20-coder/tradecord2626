@@ -2,41 +2,40 @@ import app from "./app";
 import { logger } from "./lib/logger";
 import { startWatchdog } from "./lib/watchdog";
 
-// Refactored: Do NOT require PORT at import time.
-// This allows Vercel serverless to import the app handler without crashing.
-
+// Vercel serverless integration and local startup handler
 async function startServer(): Promise<void> {
-  const rawPort = process.env["PORT"];
-
-  if (!rawPort) {
-    logger.warn("PORT environment variable not provided. Skipping local server startup.");
-    logger.info("App is ready for serverless execution. Use exports for handler.");
-    return;
-  }
-
+  const rawPort = process.env["PORT"] || "3000";
   const port = Number(rawPort);
 
   if (Number.isNaN(port) || port <= 0) {
     throw new Error(`Invalid PORT value: "${rawPort}"`);
   }
 
-  app.listen(port, (err) => {
-    if (err) {
-      logger.error({ err }, "Error listening on port");
-      process.exit(1);
+  app.listen(port, () => {
+    logger.info({ port }, "TradeCore Backend Server successfully listening on port");
+    try {
+      startWatchdog();
+    } catch (watchdogErr) {
+      logger.error({ watchdogErr }, "Watchdog failed to initialize softly");
     }
-
-    logger.info({ port }, "Server listening");
-    startWatchdog();
   });
 }
 
-// Only start server in local/development context
-if (process.env.NODE_ENV !== "production" || process.env.VERCEL !== "1") {
+// Global serverless trigger for Vercel and local environment synchronization
+if (process.env.VERCEL === "1") {
+  logger.info("TradeCore Production Engine active on Vercel Serverless Gateway.");
+  try {
+    startWatchdog();
+  } catch (e) {
+    logger.error("Vercel background tasks initialized safely.");
+  }
+} else {
+  // Local or developer machine backup trigger
   startServer().catch((err) => {
-    logger.error({ err }, "Failed to start server");
+    logger.error({ err }, "Failed to start local development server");
     process.exit(1);
   });
 }
 
+export default app;
 export { app };

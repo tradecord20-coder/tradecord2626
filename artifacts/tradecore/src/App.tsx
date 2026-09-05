@@ -230,6 +230,7 @@ function NotFoundPage() {
   );
 }
 
+
 function Router() {
   return (
     <Switch>
@@ -237,3 +238,26 @@ function Router() {
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/admin" component={AdminPage} />
       <Route component={NotFoundPage} />
+    </Switch>
+  );
+}
+
+export default function App() {
+  useEffect(() => {
+    document.documentElement.classList.add("dark");
+  }, []);
+
+  const baseEnv = import.meta.env?.BASE_URL || "";
+  const resolvedBase = baseEnv.replace(/\/$/, "");
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <WouterRouter base={resolvedBase}>
+          <Router />
+        </WouterRouter>
+        <Toaster />
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}

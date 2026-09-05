@@ -1,4 +1,4 @@
-modules = ["web-v2"]
+modules = ["nodejs-20", "web-v2"]
 run = "pnpm run dev"
 
 [[ports]]

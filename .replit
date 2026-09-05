@@ -23,5 +23,7 @@ timeoutMs = 20000
 localPort = 3000
 externalPort = 3000
 
-[nix]
-packages = ["tecoc"]
+[userenv]
+
+[userenv.shared]
+tradecord2026 = "FJIgLY7OZ8AMc7mcJ1wISIk3ksv7Dw"

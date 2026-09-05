@@ -1,134 +1,62 @@
-cd ~/workspace && cat > /tmp/TRADECORE_REAL_FINAL.sh <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-
-echo "===== TRADECORE REAL DATA FINAL ====="
-
-FRONT="artifacts/tradecore"
-API="artifacts/api-server"
-
-echo "[1] Find Binance/direct market feeds"
-grep -RInE \
-'https://api\.binance\.com|api\.binance\.com|BTCUSDT|ETHUSDT' \
-"$FRONT" "$API" . \
---exclude-dir=node_modules \
---exclude-dir=.git \
---exclude-dir=dist \
-2>/dev/null | head -200 || true
-
-echo
-echo "[2] Find Delta integration"
-grep -RInE \
-'api\.india\.delta\.exchange|delta\.exchange|DELTA_API|Delta Exchange' \
-"$FRONT" "$API" \
---exclude-dir=node_modules \
---exclude-dir=dist \
-2>/dev/null | head -300 || true
-
-echo
-echo "[3] Find active quotes route"
-grep -RInE \
-'api/quotes|quotes' \
-"$API/src" \
---exclude-dir=node_modules \
---exclude-dir=dist \
-2>/dev/null | head -200 || true
-
-echo
-echo "[4] IMPORTANT: disable direct Binance browser feed"
-
-python3 <<'PY'
-from pathlib import Path
-
-roots = [
-    Path("artifacts/tradecore"),
-    Path("artifacts/api-server"),
-]
-
-for root in roots:
-    if not root.exists():
-        continue
-
-    for p in root.rglob("*"):
-        if not p.is_file():
-            continue
-        if p.suffix not in {".html",".ts",".tsx",".js",".jsx"}:
-            continue
-        if "node_modules" in p.parts or "dist" in p.parts:
-            continue
-
-        try:
-            s = p.read_text()
-        except Exception:
-            continue
-
-        if "api.binance.com" in s:
-            print("BINANCE_DIRECT_FEED_FOUND:", p)
-
-PY
-
-echo
-echo "[5] Verify Delta provider exists"
-test -f "$API/src/lib/delta-real-market.ts" || {
-  echo "ERROR: delta-real-market.ts is missing."
-  echo "Do not deploy fake data."
-  exit 1
-}
-
-echo
-echo "[6] Verify frontend does not expose Delta credentials"
-if grep -RInE \
-'DELTA_API_SECRET|DELTA_API_KEY|DELTA_SECRET|api_secret|apiSecret' \
-"$FRONT/src" \
---exclude-dir=node_modules \
---exclude-dir=dist \
-2>/dev/null; then
-  echo "ERROR: Delta credential reference found in frontend."
-  exit 1
-fi
-
-echo
-echo "[7] Verify no fake market prices"
-grep -RInE \
-'68450|3520|145\.50|mockPrice|fakePrice|seedPrice' \
-"$FRONT/src" "$API/src" \
---exclude-dir=node_modules \
---exclude-dir=dist \
-2>/dev/null && {
-  echo "WARNING: hard-coded market value found."
-} || true
-
-echo
-echo "[8] Install"
-pnpm install --no-frozen-lockfile
-
-echo
-echo "[9] Build"
-PORT=5000 BASE_PATH=/ pnpm run build
-
-echo
-echo "[10] Build verification"
-test -f dist/public/index.html
-git diff --check
-
-echo
-echo "[11] Final Git status"
-git status --short
-git diff --stat
-
-echo
-echo "===== REAL DATA FOUNDATION VERIFIED ====="
-echo
-echo "DO NOT use the old Binance index.html as the production data source."
-echo "Production architecture must be:"
-echo
-echo "TradeCore UI"
-echo "    -> /api/quotes"
-echo "    -> Delta Exchange"
-echo
-echo "Replit and Vercel must use the SAME API contract."
-echo
-EOF
-
-chmod +x /tmp/TRADECORE_REAL_FINAL.sh
-/tmp/TRADECORE_REAL_FINAL.sh
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeCore - Financial Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+            <div>
+                <h1 id="app-title" class="text-2xl font-bold text-slate-900">TradeCore - Financial Dashboard</h1>
+                <p id="app-subtitle" class="text-sm text-slate-500">Live Crypto Market Pulse</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-slate-600">Language:</span>
+                <select id="langSelect" onchange="changeLanguage()" class="bg-slate-100 border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी</option>
+                    <option value="pa">ਪੰਜਾਬੀ</option>
+                </select>
+            </div>
+        </header>
+        <main>
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="live-market-heading" class="text-xl font-semibold text-slate-800">Live Market Pulse</h2>
+                <button onclick="loadMarketData()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm flex items-center gap-2">
+                    <span id="refresh-btn-text">Refresh Data</span>
+                </button>
+            </div>
+            <div id="crypto-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 text-center py-12">
+                    <p class="text-slate-500 animate-pulse">Loading market data...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        async function loadMarketData() {
+            const grid = document.getElementById('crypto-grid');
+            try {
+                const res = await fetch('/api/market-data');
+                const result = await res.json();
+                if (result.status === 'success' && result.data.length > 0) {
+                    grid.innerHTML = result.data.map(coin => `
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                            <span class="text-xs font-bold px-2 py-1 bg-slate-100 text-slate-600 rounded">${coin.symbol}</span>
+                            <h3 class="text-lg font-bold text-slate-800 mt-1">${coin.name}</h3>
+                            <div class="mt-4 space-y-2">
+                                <div class="flex justify-between text-sm"><span class="text-slate-500">Price:</span><span class="font-bold">$${coin.price.toLocaleString()}</span></div>
+                                <div class="flex justify-between text-sm"><span class="text-slate-500">24h Change:</span><span class="font-semibold ${coin.change_24h >= 0 ? 'text-green-600' : 'text-red-600'}">${coin.change_24h}%</span></div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) { console.error(e); }
+        }
+        loadMarketData();
+    </script>
+</body>
+</html>

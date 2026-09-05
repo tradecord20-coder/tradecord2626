@@ -2,26 +2,41 @@ import app from "./app";
 import { logger } from "./lib/logger";
 import { startWatchdog } from "./lib/watchdog";
 
-const rawPort = process.env["PORT"];
+// Refactored: Do NOT require PORT at import time.
+// This allows Vercel serverless to import the app handler without crashing.
 
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
-}
+async function startServer(): Promise<void> {
+  const rawPort = process.env["PORT"];
 
-const port = Number(rawPort);
-
-if (Number.isNaN(port) || port <= 0) {
-  throw new Error(`Invalid PORT value: "${rawPort}"`);
-}
-
-app.listen(port, (err) => {
-  if (err) {
-    logger.error({ err }, "Error listening on port");
-    process.exit(1);
+  if (!rawPort) {
+    logger.warn("PORT environment variable not provided. Skipping local server startup.");
+    logger.info("App is ready for serverless execution. Use exports for handler.");
+    return;
   }
 
-  logger.info({ port }, "Server listening");
-  startWatchdog();
-});
+  const port = Number(rawPort);
+
+  if (Number.isNaN(port) || port <= 0) {
+    throw new Error(`Invalid PORT value: "${rawPort}"`);
+  }
+
+  app.listen(port, (err) => {
+    if (err) {
+      logger.error({ err }, "Error listening on port");
+      process.exit(1);
+    }
+
+    logger.info({ port }, "Server listening");
+    startWatchdog();
+  });
+}
+
+// Only start server in local/development context
+if (process.env.NODE_ENV !== "production" || process.env.VERCEL !== "1") {
+  startServer().catch((err) => {
+    logger.error({ err }, "Failed to start server");
+    process.exit(1);
+  });
+}
+
+export { app };

@@ -4,9 +4,11 @@
   "license": "MIT",
   "scripts": {
     "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
+    "dev": "pnpm run dev:tradecore",
+    "start": "pnpm run dev:tradecore",
     "build": "pnpm run typecheck && pnpm -r --if-present run build",
     "build:tradecore": "cd artifacts/tradecore && pnpm run build",
-    "dev:tradecore": "cd artifacts/tradecore && pnpm run dev",
+    "dev:tradecore": "cd artifacts/tradecore && PORT=3000 pnpm run dev --port 3000",
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
   },

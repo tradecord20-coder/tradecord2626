@@ -171,7 +171,7 @@ export function getChannels(): ChannelRecord[] {
 }
 
 export function updateChannel(id: string, update: { budget?: number; active?: boolean }): ChannelRecord | null {
-  const existing = db.prepare("SELECT * FROM channels WHERE id = ?").get(id);
+  const existing = db.prepare("SELECT * FROM channels WHERE id = ?").get(id) as any;
   if (!existing) return null;
   const budget = update.budget === undefined ? Number(existing.budget) : Math.max(0, update.budget);
   const active = update.active === undefined ? Number(existing.active) === 1 : update.active;
@@ -254,11 +254,11 @@ export function createSimulatedTrade(params: { asset: string; channel: string; s
 }
 
 export function closeTrade(tradeId: string, exitPrice: number): TradeHistoryRecord | null {
-  const t = db.prepare("SELECT * FROM trades WHERE id = ?").get(tradeId);
+  const t = db.prepare("SELECT * FROM trades WHERE id = ?").get(tradeId) as any;
   if (!t) return null;
   const side = t.side === "SELL" ? -1 : 1;
   const pnlPercent = ((exitPrice - Number(t.entry_price)) / Number(t.entry_price)) * 100 * side;
-  const channelRow = db.prepare("SELECT budget FROM channels WHERE name = ? OR id = ?").get(t.channel, t.channel);
+  const channelRow = db.prepare("SELECT budget FROM channels WHERE name = ? OR id = ?").get(t.channel, t.channel) as any;
   const notional = Number(channelRow?.budget ?? 0);
   const pnl = Math.round((notional * pnlPercent / 100) * 100) / 100;
   const now = nowISO();
@@ -296,12 +296,12 @@ export function closeTrade(tradeId: string, exitPrice: number): TradeHistoryReco
 
 export function updateTradeMark(asset: string, currentPrice: number): void {
   if (!Number.isFinite(currentPrice)) return;
-  const trade = db.prepare("SELECT * FROM trades WHERE asset = ? OR asset LIKE ?").get(asset, `${asset}%`);
+  const trade = db.prepare("SELECT * FROM trades WHERE asset = ? OR asset LIKE ?").get(asset, `${asset}%`) as any;
   if (!trade) return;
   const entry = Number(trade.entry_price);
   const side = trade.side === "SELL" ? -1 : 1;
   const pnlPercent = entry === 0 ? 0 : ((currentPrice - entry) / entry) * 100 * side;
-  const channel = db.prepare("SELECT budget FROM channels WHERE name = ? OR id = ?").get(String(trade.channel), String(trade.channel));
+  const channel = db.prepare("SELECT budget FROM channels WHERE name = ? OR id = ?").get(String(trade.channel), String(trade.channel)) as any;
   const notional = Number(channel?.budget ?? 0);
   const pnl = Math.round((notional * pnlPercent / 100) * 100) / 100;
   db.prepare("UPDATE trades SET current_price = ?, pnl = ?, pnl_percent = ?, updated_at = ? WHERE id = ?").run(
@@ -355,7 +355,7 @@ export function setPilotState(pilotId: string, state: string, meta?: Record<stri
   db.prepare("INSERT OR REPLACE INTO pilots_state (pilot_id, state, meta, updated_at) VALUES (?, ?, ?, ?)").run(pilotId, state, meta ? JSON.stringify(meta) : null, now);
 }
 export function getPilotState(pilotId: string) {
-  const r = db.prepare("SELECT pilot_id as pilotId, state, meta, updated_at as updatedAt FROM pilots_state WHERE pilot_id = ?").get(pilotId);
+  const r = db.prepare("SELECT pilot_id as pilotId, state, meta, updated_at as updatedAt FROM pilots_state WHERE pilot_id = ?").get(pilotId) as any;
   if (!r) return null;
   return { pilotId: r.pilotId, state: r.state, meta: r.meta ? JSON.parse(r.meta) : null, updatedAt: r.updatedAt };
 }

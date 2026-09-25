@@ -1,149 +1,68 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradeCore - Financial Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1110">
+  <title>TradeCore | BTCUSD Signals</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0b1110;--panel:#131c1a;--line:#25332f;--muted:#8e9e98;--text:#edf7f0;--green:#b9ef57;--amber:#f3b54a;--red:#ff756e}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 10% 0,#19342b 0,transparent 34rem),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,sans-serif}
+    main{width:min(1080px,100%);margin:auto;padding:22px 16px 48px}.topbar,.toolbar,.metric,.card{border:1px solid var(--line);background:rgba(19,28,26,.88);border-radius:16px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;margin-bottom:20px}.brand{font-weight:800;letter-spacing:.12em;font-size:12px}.live{color:var(--green);font-size:12px}
+    h1{font-size:clamp(28px,6vw,48px);line-height:1.08;margin:0 0 10px}h2{font-size:18px;margin:0 0 14px}p{color:var(--muted);margin:0}.intro{margin:0 0 20px}.toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:12px 14px;margin:16px 0}
+    button{border:1px solid #456244;background:#20351e;color:var(--green);border-radius:10px;padding:9px 12px;font-weight:700;cursor:pointer}button:hover{filter:brightness(1.2)}.updated{font-size:12px}
+    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}.metric{padding:16px}.label{font-size:10px;letter-spacing:.14em;color:var(--muted)}.value{font-size:24px;font-weight:800;margin-top:6px}.positive{color:var(--green)}.negative{color:var(--red)}.neutral{color:var(--amber)}
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}.card{padding:18px}.quote{display:flex;justify-content:space-between;gap:12px;align-items:end;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:14px}.price{font-size:32px;font-weight:800}.signal{font-weight:900;font-size:18px}.signal.BUY{color:var(--green)}.signal.SELL{color:var(--red)}.signal.HOLD{color:var(--amber)}
+    .indicators{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.indicator{background:#0d1513;border:1px solid var(--line);border-radius:10px;padding:11px}.indicator b{display:block;font-size:16px;margin-top:3px}
+    .alert{border-left:3px solid var(--amber);background:#261f12;padding:10px 12px;border-radius:8px;margin:9px 0;color:#f8d58b}.alert.high{border-color:var(--red);background:#2a1717;color:#ffaaa5}.safe{color:var(--green);padding:12px;background:#182617;border-radius:8px}.meta{font-size:12px;color:var(--muted);margin-top:12px}
+    @media(max-width:720px){main{padding:14px 12px 32px}.metrics{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.topbar{margin-bottom:16px}.price{font-size:27px}}
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen">
-    <div class="max-w-6xl mx-auto px-4 py-8">
-        <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-slate-100 gap-4">
-            <div>
-                <h1 id="app-title" class="text-2xl font-bold text-slate-900">TradeCore - Financial Dashboard</h1>
-                <p id="app-subtitle" class="text-sm text-slate-500">Live Crypto Market Pulse & Autonomous Safeguards</p>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="flex items-center gap-2">
-                    <span class="text-sm font-medium text-slate-600">Language:</span>
-                    <select id="langSelect" onchange="changeLanguage()" class="bg-slate-100 border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="en">English</option>
-                        <option value="hi">हिंदी</option>
-                        <option value="pa">ਪੰਜਾਬੀ</option>
-                    </select>
-                </div>
-            </div>
-        </header>
-
-        <main class="space-y-6">
-            <!-- Market Section -->
-            <div>
-                <div class="flex justify-between items-center mb-6">
-                    <h2 id="live-market-heading" class="text-xl font-semibold text-slate-800">Live Market Pulse (Binance Feed)</h2>
-                    <button onclick="loadMarketData()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm flex items-center gap-2 cursor-pointer active:scale-95">
-                        <span id="refresh-btn-text">Refresh Data</span>
-                    </button>
-                </div>
-                <div id="crypto-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 text-center py-12 col-span-full">
-                        <p class="text-slate-500 animate-pulse font-semibold">Connecting to live exchange nodes...</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Risk Management / Autopilot Section -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 mt-8">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-slate-800">Autonomous Trading Guardrails</h3>
-                    <span id="guard-status" class="text-xs font-bold px-3 py-1 bg-amber-100 text-amber-800 rounded-full">SAFE MODE (STANDBY)</span>
-                </div>
-                <p class="text-xs text-slate-500 mb-4">Guards monitor price volatility and stop-loss limits continuously to protect your funds.</p>
-                <button onclick="toggleAutopilot()" id="autopilot-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow-sm">
-                    🛡️ Arm Autopilot Guard
-                </button>
-            </div>
-        </main>
-    </div>
-
-    <script>
-        let isAutopilotArmed = false;
-
-        function toggleAutopilot() {
-            isAutopilotArmed = !isAutopilotArmed;
-            const btn = document.getElementById('autopilot-btn');
-            const statusBadge = document.getElementById('guard-status');
-            if (isAutopilotArmed) {
-                btn.className = "bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow-sm";
-                btn.innerText = "🛑 Disarm Autopilot";
-                statusBadge.className = "text-xs font-bold px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full";
-                statusBadge.innerText = "LIVE ARMED & PROTECTED";
-                alert("Autopilot guard is now active with strict risk controls.");
-            } else {
-                btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow-sm";
-                btn.innerText = "🛡️ Arm Autopilot Guard";
-                statusBadge.className = "text-xs font-bold px-3 py-1 bg-amber-100 text-amber-800 rounded-full";
-                statusBadge.innerText = "SAFE MODE (STANDBY)";
-                alert("Autopilot disarmed. System is in manual observation mode.");
-            }
-        }
-
-        async function loadMarketData() {
-            const grid = document.getElementById('crypto-grid');
-            grid.innerHTML = `<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 text-center py-12 col-span-full"><p class="text-slate-500 animate-pulse font-semibold">Fetching real-time prices...</p></div>`;
-            
-            try {
-                // Fetching top 3 assets directly from Binance public API to guarantee live data everywhere (even on Vercel)
-                const [btcRes, ethRes, solRes] = await Promise.all([
-                    fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT'),
-                    fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=ETHUSDT'),
-                    fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=SOLUSDT')
-                ]);
-
-                const btc = await btcRes.json();
-                const eth = await ethRes.json();
-                const sol = await solRes.json();
-
-                const data = [
-                    { symbol: 'BTC/USDT', name: 'Bitcoin', price: parseFloat(btc.lastPrice), change_24h: parseFloat(btc.priceChangePercent) },
-                    { symbol: 'ETH/USDT', name: 'Ethereum', price: parseFloat(eth.lastPrice), change_24h: parseFloat(eth.priceChangePercent) },
-                    { symbol: 'SOL/USDT', name: 'Solana', price: parseFloat(sol.lastPrice), change_24h: parseFloat(sol.priceChangePercent) }
-                ];
-
-                grid.innerHTML = data.map(coin => `
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition">
-                        <span class="text-xs font-bold px-2 py-1 bg-slate-100 text-slate-600 rounded">${coin.symbol}</span>
-                        <h3 class="text-lg font-bold text-slate-800 mt-1">${coin.name}</h3>
-                        <div class="mt-4 space-y-2">
-                            <div class="flex justify-between text-sm"><span class="text-slate-500">Price:</span><span class="font-bold text-slate-900">$${coin.price.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
-                            <div class="flex justify-between text-sm"><span class="text-slate-500">24h Change:</span><span class="font-semibold ${coin.change_24h >= 0 ? 'text-green-600' : 'text-red-600'}">${coin.change_24h >= 0 ? '+' : ''}${coin.change_24h.toFixed(2)}%</span></div>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (e) {
-                console.error(e);
-                grid.innerHTML = `<div class="bg-white p-6 rounded-xl shadow-sm border border-red-100 text-center py-12 col-span-full"><p class="text-red-500 font-medium">Failed to fetch live market nodes. Please check connection.</p></div>`;
-            }
-        }
-
-        function changeLanguage() {
-            const lang = document.getElementById('langSelect').value;
-            const title = document.getElementById('app-title');
-            const subtitle = document.getElementById('app-subtitle');
-            const heading = document.getElementById('live-market-heading');
-            const btnText = document.getElementById('refresh-btn-text');
-
-            if (lang === 'hi') {
-                title.innerText = "ट्रेडकोर - फाइनेंशियल डैशबोर्ड";
-                subtitle.innerText = "लाइव क्रिप्टो मार्केट पल्स और ऑटोमैटेड सेफगार्ड्स";
-                heading.innerText = "लाइव मार्केट फीड (बाइनेंस)";
-                btnText.innerText = "डेटा रीफ्रेश करें";
-            } else if (lang === 'pa') {
-                title.innerText = "ਟਰੇਡਕੋਰ - ਫਾਈਨੈਂਸ਼ੀਅਲ ਡੈਸ਼ਬੋਰਡ";
-                subtitle.innerText = "ਲਾਈਵ ਕ੍ਰਿਪਟੋ ਮਾਰਕੀਟ ਪਲਸ";
-                heading.innerText = "ਲਾਈਵ ਮਾਰਕੀਟ ਫੀਡ (ਬਾਇਨੈਂਸ)";
-                btnText.innerText = "ਡਾਟਾ ਰਿਫ੍ਰੈਸ਼ ਕਰੋ";
-            } else {
-                title.innerText = "TradeCore - Financial Dashboard";
-                subtitle.innerText = "Live Crypto Market Pulse & Autonomous Safeguards";
-                heading.innerText = "Live Market Pulse (Binance Feed)";
-                btnText.innerText = "Refresh Data";
-            }
-        }
-
-        // Initial load and auto refresh
-        loadMarketData();
-        setInterval(loadMarketData, 6000);
-    </script>
+<body>
+<main>
+  <header class="topbar"><span class="brand">TRADECORE</span><span class="live">● DATA LINK NOMINAL</span></header>
+  <section class="intro"><h1>BTCUSD market intelligence.</h1><p>Real-time price tracking, technical trend analysis, and loss-prevention alerts. Execution remains guarded.</p></section>
+  <div class="toolbar"><span id="updated" class="updated">Loading market data…</span><button id="refresh">Refresh data</button></div>
+  <section class="metrics">
+    <div class="metric"><div class="label">BTCUSD</div><div id="btc-price" class="value">—</div><p id="btc-change">Waiting for quote</p></div>
+    <div class="metric"><div class="label">MODEL SIGNAL</div><div id="signal" class="value neutral">—</div><p id="confidence">Technical trend model</p></div>
+    <div class="metric"><div class="label">RISK STATUS</div><div id="risk" class="value neutral">—</div><p id="guardrail">Guardrail evaluating</p></div>
+  </section>
+  <section class="grid">
+    <article class="card"><h2>Market pulse</h2><div class="quote"><div><p>BTC / USDT</p><div id="main-price" class="price">—</div></div><div id="source" class="meta">—</div></div><div id="indicators" class="indicators"></div></article>
+    <article class="card"><h2>Loss-prevention alerts</h2><div id="alerts"><div class="safe">Checking volatility and downside momentum…</div></div><p class="meta">Signals are informational and cannot guarantee profit or prevent loss.</p></article>
+  </section>
+</main>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const money = (value, currency) => `${currency === 'USDT' ? '$' : ''}${Number(value).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+  function render(data) {
+    const quote=data.quote, analysis=data.analysis, indicators=analysis.indicators||{};
+    const change=Number(quote.changePercent||0);
+    $('btc-price').textContent=money(quote.price,quote.currency);
+    $('main-price').textContent=money(quote.price,quote.currency);
+    $('btc-change').textContent=`${change>=0?'+':''}${change.toFixed(2)}% in 24h`;
+    $('btc-change').className=change>=0?'positive':'negative';
+    $('signal').textContent=analysis.signal;
+    $('signal').className=`value signal ${analysis.signal}`;
+    $('confidence').textContent=`${analysis.confidence}% confidence · ${analysis.direction}`;
+    $('risk').textContent=analysis.riskLevel.toUpperCase();
+    $('risk').className=`value ${analysis.riskLevel==='high'?'negative':analysis.riskLevel==='warning'?'neutral':'positive'}`;
+    $('guardrail').textContent=analysis.guardrailAction.replaceAll('_',' ');
+    $('source').textContent=`${quote.source} · ${new Date(quote.updatedAt).toLocaleTimeString()}`;
+    const fields=[['RSI (14)',indicators.rsi14],['MACD',indicators.macd],['MACD signal',indicators.macdSignal],['SMA (20)',indicators.sma20],['SMA (50)',indicators.sma50],['EMA (12)',indicators.ema12]];
+    $('indicators').innerHTML=fields.map(([name,value])=>`<div class="indicator"><span class="label">${name}</span><b>${value==null?'—':Number(value).toLocaleString('en-US',{maximumFractionDigits:4})}</b></div>`).join('');
+    const alerts=analysis.riskAlerts||[];
+    $('alerts').innerHTML=alerts.length?alerts.map(alert=>`<div class="alert ${alert.severity}"><b>${alert.severity.toUpperCase()}</b><br>${alert.message}</div>`).join(''):'<div class="safe">No elevated risk detected. Continue monitoring.</div>';
+    $('updated').textContent=`Updated ${new Date(data.timestamp).toLocaleTimeString()}`;
+  }
+  async function load() {
+    $('updated').textContent='Refreshing market data…';
+    try { const response=await fetch('/api/market-data?symbol=BTCUSDT&interval=1h&limit=200',{cache:'no-store'}); if(!response.ok) throw new Error(await response.text()); render(await response.json()); }
+    catch(error) { $('updated').textContent='Market data temporarily unavailable'; $('alerts').innerHTML=`<div class="alert high">Unable to refresh signals safely. New entries should remain paused.</div>`; console.error(error); }
+  }
+  $('refresh').addEventListener('click',load); load(); setInterval(load,15000);
+</script>
 </body>
 </html>

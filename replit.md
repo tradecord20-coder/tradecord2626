@@ -1,45 +1,59 @@
-# [Project name]
+# TradeCore
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Production-ready market monitoring and trading-operations dashboard with guarded execution, technical BTCUSD signals, and loss-prevention alerts.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `gunicorn --bind 0.0.0.0:${PORT:-8080} app:app` — run the production Flask server
+- `python -m py_compile app.py tradecord2626/app.py` — validate Python syntax
+- `pnpm --filter @workspace/tradecore run build` — build the React dashboard served by Flask when available
+- `pnpm run typecheck` — typecheck the TypeScript workspace
+- `pnpm run build` — typecheck and build all TypeScript packages
+- Required Python packages are pinned in `requirements.txt`
+- Optional `TRADECORE_DB_PATH` selects the SQLite file; default is `data/tradecore.sqlite`
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Primary server: Flask 3 + Gunicorn
+- Market providers: Binance with CoinGecko fallback and bounded retries
+- Storage: SQLite for dashboard state and trade marks
+- Frontend: React/Vite build with a standalone HTML fallback template
+- Existing TypeScript API artifact remains available under `artifacts/api-server`
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `app.py` — production Flask entrypoint, market provider, indicators, signals, alerts, and API routes
+- `templates/index.html` — standalone fallback market dashboard
+- `artifacts/tradecore` — primary React/Vite dashboard
+- `artifacts/api-server` — existing TypeScript API service
+- `data/tradecore.sqlite` — local dashboard state
+- `vercel.json` and `.replit` — deployment entrypoint configuration
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Public market data is read-only and execution is guarded; no order is placed by the signal engine.
+- Binance is preferred for live BTCUSDT candles and CoinGecko is used as a fallback.
+- Technical trend analysis returns HOLD when historical candles are unavailable instead of inventing a prediction.
+- Cached provider data is labeled as cached when all live providers fail.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+TradeCore shows live BTCUSD/BTCUSDT market data, RSI/MACD/moving averages, directional trend signals, volatility and drawdown warnings, wallet/trade summaries, and guarded WhatsApp command handling.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+The required WhatsApp control number is `+919050093930`, and the admin contact is `tradecord20@gmail.com`.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- `PORT` is parsed and validated; the app binds to `0.0.0.0` for hosted environments.
+- Build the React artifact before production startup if the polished React UI should be served instead of the fallback template.
+- WhatsApp remains `not_configured` until Twilio credentials are supplied through secrets.
 
 ## Pointers
 
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- Market API: `/api/market-data?symbol=BTCUSDT`
+- Technical analysis: `/api/analysis/BTCUSDT`
+- Signals: `/api/signals?symbol=BTCUSDT`
+- Risk alerts: `/api/alerts?symbol=BTCUSDT`
+- Health: `/api/healthz`

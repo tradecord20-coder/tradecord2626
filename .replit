@@ -1,10 +1,46 @@
-modules = ["nodejs-20", "web-v2"]
-run = "pnpm --filter @workspace/tradecore run dev"
+modules = ["nodejs-20", "web-v2", "python-3.11"]
+run = "gunicorn --bind 0.0.0.0:${PORT:-8080} app:app"
+
+[deployment]
+run = "gunicorn --bind 0.0.0.0:${PORT:-8080} app:app"
+build = "pnpm --filter @workspace/tradecore run build"
+deploymentTarget = "cloudrun"
+
+[nix]
+channel = "stable-25_05"
+packages = ["yakut"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=5000 gunicorn --bind 0.0.0.0:5000 --workers 1 --access-logfile - app:app"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [[ports]]
 localPort = 3000
-externalPort = 3000
 
-[deployment]
-run = "pnpm --filter @workspace/tradecore run dev"
-build = "pnpm --filter @workspace/tradecore run build"
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 8081
+externalPort = 8081

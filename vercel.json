@@ -1,5 +1,8 @@
 {
   "version": 2,
-  "outputDirectory": "dist",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "routes": [
+    { "src": "/assets/(.*)", "dest": "/artifacts/tradecore/dist/public/assets/$1" },
+    { "src": "/(.*)", "dest": "/artifacts/tradecore/dist/public/index.html" }
+  ]
 }

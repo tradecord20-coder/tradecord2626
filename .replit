@@ -1,47 +1,21 @@
 modules = ["nodejs-20", "web-v2", "python-3.11"]
-run = "gunicorn --bind 0.0.0.0:${PORT:-8080} app:app"
+
+# जब आप Replit में 'Run' बटन दबाएंगे, तब यह कमांड चलेगी
+run = "fuser -k 3000/tcp 5001/tcp 2>/dev/null || true; (python3 tradecore/app.py > /dev/null 2>&1 &) && pnpm dev --port 3000 --host 0.0.0.0"
 
 [deployment]
-run = "gunicorn --bind 0.0.0.0:${PORT:-8080} app:app"
-build = "pnpm --filter @workspace/tradecore run build"
+# यह कमांड Replit पर पब्लिश (Deploy) करते समय ऐप को पोर्ट 3000 पर लॉक रखेगी
+run = "fuser -k 3000/tcp 5001/tcp 2>/dev/null || true; (python3 tradecore/app.py > /dev/null 2>&1 &) && pnpm dev --port 3000 --host 0.0.0.0"
+build = "pnpm install && pnpm build"
 deploymentTarget = "cloudrun"
 
 [nix]
 channel = "stable-25_05"
-packages = ["yakut"]
-
-[workflows]
-runButton = "Project"
-
-[[workflows.workflow]]
-name = "Project"
-mode = "parallel"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Start application"
-
-[[workflows.workflow]]
-name = "Start application"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "PORT=5000 gunicorn --bind 0.0.0.0:5000 --workers 1 --access-logfile - app:app"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
+packages = ["yakut", "psmisc"]
 
 [[ports]]
 localPort = 3000
 externalPort = 3000
 
 [[ports]]
-localPort = 5000
-externalPort = 80
-
-[[ports]]
-localPort = 8081
-externalPort = 8081
+localPort = 8080

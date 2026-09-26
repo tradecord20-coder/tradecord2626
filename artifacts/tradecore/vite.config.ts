@@ -5,10 +5,8 @@ import { defineConfig } from 'vite';
 
 import runtimeErrorOverlay from '@replit/vite-plugin-runtime-error-modal';
 
-// Use sensible defaults for PORT and BASE_PATH to support Vercel build
-const rawPort = process.env.PORT || '5173';
+const rawPort = process.env.PORT || '3000';
 const basePath = process.env.BASE_PATH || '/';
-
 const port = Number(rawPort);
 
 if (Number.isNaN(port) || port <= 0) {
@@ -21,8 +19,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     runtimeErrorOverlay(),
-    ...(process.env.NODE_ENV !== 'production' &&
-    process.env.REPL_ID !== undefined
+    ...(process.env.NODE_ENV !== 'production' && process.env.REPL_ID !== undefined
       ? [
           await import('@replit/vite-plugin-cartographer').then((m) =>
             m.cartographer({
@@ -49,7 +46,8 @@ export default defineConfig({
   },
   root: path.resolve(import.meta.dirname),
   build: {
-    outDir: path.resolve(import.meta.dirname, 'dist/public'),
+    // 404 एरर को हमेशा के लिए ख़त्म करने के लिए आउटपुट को सीधे रूट के dist फ़ोल्डर में लॉक कर दिया है
+    outDir: path.resolve(import.meta.dirname, '../../dist'),
     emptyOutDir: true,
   },
   server: {

@@ -1,5 +1,6 @@
 {
-  "buildCommand": "pnpm --filter mockup-sandbox build",
-  "outputDirectory": "artifacts/mockup-sandbox/dist",
-  "installCommand": "pnpm install --no-frozen-lockfile --filter mockup-sandbox..."
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
+  "installCommand": "pnpm install",
+  "framework": "vite"
 }

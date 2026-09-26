@@ -1,14 +1,10 @@
-minimumReleaseAge: 1440
-
-minimumReleaseAgeExclude:
-  - '@replit/*'
-  - stripe-replit-sync
-
 packages:
-  - 'artifacts/*'
-  - 'lib/*'
-  - 'lib/api-client-react'
-  - 'scripts'
+  - artifacts/*
+  - lib/*
+  - lib/api-client-react
+  - scripts
+
+autoInstallPeers: false
 
 catalog:
   '@replit/vite-plugin-cartographer': ^0.5.21
@@ -34,7 +30,14 @@ catalog:
   wouter: ^3.3.5
   zod: ^3.25.76
 
-autoInstallPeers: false
+ignoredBuiltDependencies:
+  - better-sqlite3
+
+minimumReleaseAge: 1440
+
+minimumReleaseAgeExclude:
+  - '@replit/*'
+  - stripe-replit-sync
 
 onlyBuiltDependencies:
   - '@swc/core'

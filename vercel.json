@@ -1,11 +1,6 @@
 {
-  "framework": "vite",
-  "public": false,
-  "cleanUrls": true,
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/artifacts/tradecore/$1"
-    }
-  ]
+  "version": 2,
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist/public",
+  "framework": "vite"
 }

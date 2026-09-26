@@ -1,6 +1,6 @@
 {
-  "buildCommand": "pnpm build",
-  "outputDirectory": "dist",
+  "buildCommand": "pnpm --filter tradecore build || vite build",
+  "outputDirectory": "artifacts/tradecore/dist",
   "installCommand": "pnpm install --no-frozen-lockfile",
   "framework": "vite"
 }

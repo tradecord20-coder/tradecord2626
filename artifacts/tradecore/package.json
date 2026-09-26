@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000 --strictPort",
-    "build": "vite build --outDir ../../dist",
+    "build": "vite build --outDir ../../public --emptyOutDir",
     "serve": "vite preview --host 0.0.0.0",
-    "typecheck": "echo 'Bypassing sub-workspace typecheck'"
+    "typecheck": "echo 'Bypassing typecheck'"
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",

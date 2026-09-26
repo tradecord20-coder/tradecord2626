@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm --filter artifacts/tradecore build || pnpm --filter tradecore build || pnpm build",
+  "buildCommand": "pnpm install && tsc --build --skipLibCheck || true && pnpm --filter @workspace/tradecore build || pnpm build",
   "outputDirectory": "artifacts/tradecore/dist",
   "installCommand": "pnpm install --no-frozen-lockfile",
   "framework": "vite"

@@ -1,5 +1,6 @@
 {
   "buildCommand": "pnpm --filter mockup-sandbox build",
   "outputDirectory": "artifacts/mockup-sandbox/dist",
-  "installCommand": "pnpm install"
+  "installCommand": "pnpm install",
+  "framework": null
 }

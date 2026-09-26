@@ -1,8 +1,8 @@
 packages:
-  - artifacts/*
-  - lib/*
-  - lib/api-client-react
-  - scripts
+  - "artifacts/*"
+  - "lib/*"
+  - "lib/api-client-react"
+  - "scripts"
 
 autoInstallPeers: false
 
@@ -43,4 +43,3 @@ onlyBuiltDependencies:
   - '@swc/core'
   - esbuild
   - msw
-  - unrs-resolver

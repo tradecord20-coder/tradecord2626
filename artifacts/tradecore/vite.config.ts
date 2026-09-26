@@ -46,22 +46,10 @@ export default defineConfig({
   },
   root: path.resolve(import.meta.dirname),
   build: {
-    // 404 एरर को हमेशा के लिए ख़त्म करने के लिए आउटपुट को सीधे रूट के dist फ़ोल्डर में लॉक कर दिया है
-    outDir: path.resolve(import.meta.dirname, '../../dist'),
+    // वर्सल के रूट स्कोप के ठीक अंदर 'dist' बनाने का सटीक पाथ
+    outDir: '../../dist',
     emptyOutDir: true,
   },
-  server: {
-    port,
-    strictPort: true,
-    host: '0.0.0.0',
-    allowedHosts: true,
-    fs: {
-      strict: true,
-    },
-  },
-  preview: {
-    port,
-    host: '0.0.0.0',
-    allowedHosts: true,
-  },
+  server: { port, strictPort: true, host: '0.0.0.0', allowedHosts: true },
+  preview: { port, host: '0.0.0.0', allowedHosts: true },
 });

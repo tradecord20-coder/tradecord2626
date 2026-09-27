@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "pnpm --filter @workspace/tradecore build || pnpm build",
-  "outputDirectory": "artifacts/tradecore/dist/public",
+  "outputDirectory": "public",
   "cleanUrls": true
 }
